@@ -1,11 +1,28 @@
 // Package vql implements a reflective query interface to traverse Go values.
-// Given a vql.Query q and an arbitrary value v, vql.Eval(q, v) returns the
-// object produced by evaluating q starting at v.
+// A vql.Query q describes a sequence of steps in the structure of a compound
+// value (struct, slice, map). For a value v, vql.Eval(q, v) performs the steps
+// described by q starting at v, and reports the value obtained.
 //
-// A vql.Query describes how to traverse the structure of an input value.
-// Operations include field and map key lookup, sequential composition,
-// traversal and filtering of array/slice values, and extraction of
-// substructures.
+// Queries
+//
+// To fetch a named field from a struct, or the value from a string-keyed map,
+// use vql.Key.
+//
+// To index into a slice of values, use vql.Index.
+//
+// To walk sequentially into the structure of a value, use vql.Seq.
+//
+// To apply a subquery to the elements of a slice, use vql.Each.
+//
+// To filter the elements of a slice based on a subquery, use vql.Select.
+//
+// To extract subqueries from a value, use vql.Bind.
+//
+// To apply a functional transformation to a value, use vql.With.
+//
+// To construct a list of subquery values, use vql.List.
+//
+// To select one of a sequence of subqueries to apply, use vql.Or.
 //
 // TODO: Add more descriptive errors.
 package vql
