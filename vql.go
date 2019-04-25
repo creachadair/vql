@@ -111,7 +111,7 @@ func (k keyQuery) eval(v *value) (*value, error) {
 }
 
 // Each returns a Query that applies q to each element of an array or slice,
-// and yields a slice (of type []interface{}) containing the resulting values.
+// and yields a slice of type []interface{} containing the resulting values.
 func Each(q Query) Query { return mapQuery{q} }
 
 type mapQuery struct{ Query }
