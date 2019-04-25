@@ -211,6 +211,21 @@ func (q indexQuery) eval(v *value) (*value, error) {
 	return pushValue(v, rv.Index(offset).Interface()), nil
 }
 
+// Or is a Query that yields the first non-nil value among the given queries in
+// left-to-right order. If no queries are given, the result is nil.  Errors in
+// evaluating subqueries are ignored.
+type Or []Query
+
+func (o Or) eval(v *value) (*value, error) {
+	for _, q := range o {
+		next, err := q.eval(v)
+		if err == nil && next.val != nil {
+			return pushValue(v, next.val), nil
+		}
+	}
+	return pushValue(v, nil), nil
+}
+
 func forEach(v interface{}, f func(interface{}) error) error {
 	rv, err := seqValue(v)
 	if err != nil {

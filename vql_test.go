@@ -83,6 +83,13 @@ func TestQueries(t *testing.T) {
 		{vql.Each(vql.With(vql.Key("B"), func(obj interface{}) interface{} {
 			return obj.(int) > 20
 		})), []*thingy{&t1, t2}, []bool{false, true}},
+
+		{vql.Or{
+			vql.Index(10),     // error, ignored
+			vql.Const(nil),    // nil value, ignored
+			vql.Index(1),      // non-nil value, selected
+			vql.Const("whee"), // unevaluated
+		}, []string{"all", "bears", "chug", "diesel"}, "bears"},
 	}
 	for _, test := range tests {
 		got, err := vql.Eval(test.query, test.input)
