@@ -165,3 +165,16 @@ func ExampleOr() {
 	// Output:
 	// settling
 }
+
+func ExampleList() {
+	res, err := vql.Eval(vql.List{
+		vql.Key("mice"),
+		vql.Key("men"),
+	}, map[string]bool{"mice": true, "men": false, "cows": true})
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(res)
+	// Output:
+	// [true false]
+}
