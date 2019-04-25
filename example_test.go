@@ -3,6 +3,7 @@ package vql_test
 import (
 	"fmt"
 	"log"
+	"strings"
 
 	"bitbucket.org/creachadair/vql"
 )
@@ -127,4 +128,16 @@ func ExampleBind() {
 	fmt.Printf("Address %s, port %d\n", m["address"], m["port"])
 	// Output:
 	// Address 129.170.16.50, port 75
+}
+
+func ExampleWith() {
+	res, err := vql.Eval(vql.With(vql.Self, func(obj interface{}) interface{} {
+		return strings.Join(strings.Fields(obj.(string)), " ")
+	}), " a messy\n \t string\n\n")
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(res)
+	// Output:
+	// a messy string
 }
