@@ -180,8 +180,9 @@ func (s selectQuery) eval(v *value) (*value, error) {
 
 // Bind returns a Query that binds the values from the specified subqueries to
 // the corresponding keys in a string-to-value map.  The concrete type of the
-// result is map[string]interface{}. It is not an error for requested values to
-// be missing; their corresponding values will be nil.
+// result is map[string]interface{}, and the concrete type of each value is
+// whatever was expressed by the corresponding subquery. It is not an error for
+// requested values to be missing; their corresponding values will be nil.
 func Bind(m map[string]Query) Query { return bindQuery(m) }
 
 type bindQuery map[string]Query
