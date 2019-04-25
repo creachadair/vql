@@ -88,3 +88,24 @@ func ExampleEach() {
 	// Output:
 	// [one uno eins 一]
 }
+
+func ExampleSelect() {
+	res, err := vql.Eval(vql.Select(vql.Key("age"), func(obj interface{}) bool {
+		return obj.(int) > 35
+	}), []map[string]int{
+		{"age": 19, "id": 10332, "height": 180},
+		{"age": 39, "id": 10335, "height": 143},
+		{"age": 34, "id": 92131, "height": 139},
+		{"age": 65, "id": 7153, "height": 182},
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	for _, elt := range res.([]interface{}) {
+		m := elt.(map[string]int)
+		fmt.Printf("Age %d years, ID %d, height %d cm\n", m["age"], m["id"], m["height"])
+	}
+	// Output:
+	// Age 39 years, ID 10335, height 143 cm
+	// Age 65 years, ID 7153, height 182 cm
+}
