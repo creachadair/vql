@@ -35,8 +35,7 @@ func ExampleEval() {
 	execNames := vql.Seq{
 		vql.Key("People"),
 		vql.Select(vql.Key("Exec"), func(obj interface{}) bool {
-			b, ok := obj.(bool)
-			return ok && b
+			return obj.(bool)
 		}),
 		vql.Each(vql.Key("Name")),
 	}
