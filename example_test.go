@@ -41,11 +41,21 @@ func ExampleEval() {
 		vql.Each(vql.Key("Name")),
 	}
 
-	res, err := vql.Eval(execNames, input)
+	// Executing a query on the input returns the matching results.
+	all, err := vql.Eval(execNames, input)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("%q\n", res)
+	fmt.Printf("All execs: %v\n", all)
+
+	// Queries can be composed.
+	res, err := vql.Eval(vql.Seq{execNames, vql.Index(0)}, input)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Printf("First exec: %s\n", res.(string))
+
 	// Output:
-	// ["Alice" "Dave"]
+	// All execs: [Alice Dave]
+	// First exec: Alice
 }
