@@ -27,9 +27,13 @@ func TestQueries(t *testing.T) {
 		S: []string{"pear", "plum", "cherry"},
 		T: t2,
 	}
-	m := map[string]string{
+	sm := map[string]string{
 		"oh":   "bother",
 		"said": "pooh",
+	}
+	zm := map[int]string{
+		10: "ten",
+		12: "twelve",
 	}
 
 	tests := []struct {
@@ -47,8 +51,10 @@ func TestQueries(t *testing.T) {
 		{vql.Key("B"), t1, 17},
 		{vql.Key("S"), t1, []string{"pear", "plum", "cherry"}},
 		{vql.Key("C"), t1, nil},
-		{vql.Key("oh"), m, "bother"},
-		{vql.Key("piglet"), m, nil},
+		{vql.Key("oh"), sm, "bother"},
+		{vql.Key("piglet"), sm, nil},
+		{vql.Key(10), zm, "ten"},
+		{vql.Key(11), zm, nil},
 
 		{vql.Seq(nil), "whatever", "whatever"},
 		{vql.Seq{}, "whatever", "whatever"},

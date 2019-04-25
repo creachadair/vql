@@ -94,32 +94,39 @@ func (s Seq) eval(v *value) (*value, error) {
 }
 
 // Key returns a Query that returns the value of the specified field on a
-// struct, or entry in a map with string keys, or nil if no such field or key
-// exists. It is an error if the value type is not a struct or string-key map.
-func Key(s string) Query { return keyQuery(s) }
+// struct, or entry in a map, or nil if no such field or key exists. It is an
+// error if the value type is not a struct or a map with a compatible key type.
+func Key(key interface{}) Query { return keyQuery{key: key} }
 
 // Keys is a convenience shorthand for a Seq of the specified keys.
-func Keys(keys ...string) Query {
+func Keys(keys ...interface{}) Query {
 	q := make(Seq, len(keys))
 	for i, key := range keys {
-		q[i] = keyQuery(key)
+		q[i] = Key(key)
 	}
 	return q
 }
 
-type keyQuery string
-
-var stringType = reflect.TypeOf("string")
+type keyQuery struct {
+	key interface{}
+}
 
 func (k keyQuery) eval(v *value) (*value, error) {
 	rv := reflect.Indirect(reflect.ValueOf(v.val))
 	var f reflect.Value
 	if rv.Kind() == reflect.Struct {
-		f = rv.FieldByName(string(k))
-	} else if rv.Kind() == reflect.Map && rv.Type().Key() == stringType {
-		f = rv.MapIndex(reflect.ValueOf(string(k)))
+		if s, ok := k.key.(string); ok {
+			f = rv.FieldByName(s)
+		} else {
+			return nil, fmt.Errorf("value of type %T cannot be a field name", k.key)
+		}
+	} else if rv.Kind() == reflect.Map {
+		if !reflect.TypeOf(k.key).AssignableTo(rv.Type().Key()) {
+			return nil, fmt.Errorf("value of type %T cannot be a key in this map", k.key)
+		}
+		f = rv.MapIndex(reflect.ValueOf(k.key))
 	} else {
-		return nil, fmt.Errorf("value of type %T is not a struct or string map", v.val)
+		return nil, fmt.Errorf("value of type %T is not a struct or map", v.val)
 	}
 	if !f.IsValid() {
 		return pushValue(v, nil), nil
