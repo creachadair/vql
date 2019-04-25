@@ -172,20 +172,20 @@ func (b bindQuery) eval(v *value) (*value, error) {
 	return pushValue(v, result), nil
 }
 
-// As returns a Query whose value is the result of applying f to the value of q.
-func As(q Query, f func(interface{}) interface{}) Query { return asQuery{q, f} }
+// With returns a Query whose value is the result of applying f to the value of q.
+func With(q Query, f func(interface{}) interface{}) Query { return withQuery{q, f} }
 
-type asQuery struct {
+type withQuery struct {
 	Query
 	f func(interface{}) interface{}
 }
 
-func (a asQuery) eval(v *value) (*value, error) {
-	result, err := a.Query.eval(v)
+func (w withQuery) eval(v *value) (*value, error) {
+	result, err := w.Query.eval(v)
 	if err != nil {
 		return nil, err
 	}
-	return pushValue(v, a.f(result.val)), nil
+	return pushValue(v, w.f(result.val)), nil
 }
 
 // Index returns a Query that selects the item at a specified offset in an
