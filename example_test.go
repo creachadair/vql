@@ -134,7 +134,7 @@ func ExampleAs() {
 	cleanString := func(obj interface{}) interface{} {
 		return strings.Join(strings.Fields(obj.(string)), " ")
 	}
-	res, err := vql.Eval(vql.As(vql.Self, cleanString), " a messy\n \t string\n\n")
+	res, err := vql.Eval(vql.As(cleanString), " a messy\n \t string\n\n")
 	if err != nil {
 		log.Fatal(err)
 	}

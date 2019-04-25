@@ -196,21 +196,12 @@ func (b bindQuery) eval(v *value) (*value, error) {
 	return pushValue(v, result), nil
 }
 
-// As returns a Query whose value is the result of applying f to the value of q.
-func As(q Query, f Transform) Query { return asQuery{q, f} }
+// As returns a Query whose value is the result of applying f to its input.
+func As(f Transform) Query { return asQuery(f) }
 
-type asQuery struct {
-	Query
-	f func(interface{}) interface{}
-}
+type asQuery Transform
 
-func (w asQuery) eval(v *value) (*value, error) {
-	result, err := w.Query.eval(v)
-	if err != nil {
-		return nil, err
-	}
-	return pushValue(v, w.f(result.val)), nil
-}
+func (a asQuery) eval(v *value) (*value, error) { return pushValue(v, a(v.val)), nil }
 
 // Index returns a Query that selects the item at a specified offset in an
 // array or slice. Offsets are 0-based, with negative offsets referring to
