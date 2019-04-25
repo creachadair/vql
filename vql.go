@@ -5,8 +5,8 @@
 //
 // Queries
 //
-// To fetch a named field from a struct, or the value from a string-keyed map,
-// use vql.Key.
+// To fetch a named field from a struct, or the value from a map, use vql.Key.
+// Compound lookups can be chained with vql.Keys.
 //
 // To index into a slice of values, use vql.Index.
 //
