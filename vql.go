@@ -197,7 +197,7 @@ func (b bindQuery) eval(v *value) (*value, error) {
 }
 
 // As returns a Query whose value is the result of applying f to the value of q.
-func As(q Query, f func(interface{}) interface{}) Query { return asQuery{q, f} }
+func As(q Query, f Transform) Query { return asQuery{q, f} }
 
 type asQuery struct {
 	Query
