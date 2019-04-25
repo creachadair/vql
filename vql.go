@@ -1,8 +1,11 @@
 // Package vql implements a reflective query interface to traverse Go values.
-// Given a query q and a value v, vql.Eval(q, v) returns the object described
-// by the query starting from v, or an error.
+// Given a vql.Query q and an arbitrary value v, vql.Eval(q, v) returns the
+// object produced by evaluating q starting at v.
 //
-// TODO: This package needs much more documentation.
+// A vql.Query describes how to traverse the structure of an input value.
+// Operations include field and map key lookup, sequential composition,
+// traversal and filtering of array/slice values, and extraction of
+// substructures.
 //
 // TODO: Implement additional interesting query operators.
 package vql
@@ -12,7 +15,7 @@ import (
 	"reflect"
 )
 
-// Eval evaluates q starting from v, and returns the object reached.
+// Eval evaluates q starting from v, and returns the object described.
 func Eval(q Query, v interface{}) (interface{}, error) {
 	result, err := q.eval(newValue(v))
 	if err != nil {
@@ -21,8 +24,9 @@ func Eval(q Query, v interface{}) (interface{}, error) {
 	return result.val, nil
 }
 
-// A value carries a value through a query, encapsulating the value and the
-// parent value from which it was produced.
+// A value carries a value through a query, encapsulating the current state of
+// query expansion (val) and the parent value from which it was produced.  The
+// initial input to a query has parent == nil.
 type value struct {
 	val    interface{}
 	parent *value
@@ -77,7 +81,7 @@ func (s Seq) eval(v *value) (*value, error) {
 // exists. It is an error if the value type is not a struct or string-key map.
 func Key(s string) Query { return keyQuery(s) }
 
-// Keys is a convenient shorthand for a Seq of the specified keys.
+// Keys is a convenience shorthand for a Seq of the specified keys.
 func Keys(keys ...string) Query {
 	q := make(Seq, len(keys))
 	for i, key := range keys {
@@ -106,9 +110,9 @@ func (k keyQuery) eval(v *value) (*value, error) {
 	return pushValue(v, f.Interface()), nil
 }
 
-// Each returns a Query that applies v to each element of an array or slice,
+// Each returns a Query that applies q to each element of an array or slice,
 // and yields a slice (of type []interface{}) containing the resulting values.
-func Each(v Query) Query { return mapQuery{v} }
+func Each(q Query) Query { return mapQuery{q} }
 
 type mapQuery struct{ Query }
 
