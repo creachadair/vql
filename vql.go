@@ -188,6 +188,29 @@ func (a asQuery) eval(v *value) (*value, error) {
 	return pushValue(v, a.f(result.val)), nil
 }
 
+// Index returns a Query that selects the item at a specified offset in an
+// array or slice. Offsets are 0-based, with negative offsets referring to
+// offsets from the end of the sequence. An offset outside the range of the
+// sequence report an error.
+func Index(i int) Query { return indexQuery(i) }
+
+type indexQuery int
+
+func (q indexQuery) eval(v *value) (*value, error) {
+	rv := reflect.ValueOf(v.val)
+	if k := rv.Kind(); k != reflect.Array && k != reflect.Slice {
+		return nil, fmt.Errorf("value of type %T is not an array or slice", v)
+	}
+	offset := int(q)
+	if offset < 0 {
+		offset += rv.Len()
+	}
+	if offset >= rv.Len() || offset < 0 {
+		return nil, fmt.Errorf("index %d is out of range for 0..%d", offset, rv.Len())
+	}
+	return pushValue(v, rv.Index(offset).Interface()), nil
+}
+
 // TODO: Nicer error messages.
 
 func forEach(v interface{}, f func(interface{}) error) error {

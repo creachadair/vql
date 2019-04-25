@@ -64,6 +64,9 @@ func TestQueries(t *testing.T) {
 
 		{vql.Each(vql.Key("A")), []*thingy{&t1, t2}, []interface{}{"foo", "bar"}},
 
+		{vql.Seq{vql.Keys("T", "S"), vql.Index(-1)}, t1, "pie"},
+		{vql.Seq{vql.Key("S"), vql.Index(1)}, t1, "plum"},
+
 		{vql.Seq{
 			vql.Key("S"),
 			vql.Select(vql.Self, func(obj interface{}) bool {
@@ -91,3 +94,5 @@ func TestQueries(t *testing.T) {
 		}
 	}
 }
+
+// TODO: Add tests for error conditions.
