@@ -57,6 +57,10 @@ func TestQueries(t *testing.T) {
 		{vql.Seq{vql.Key("T"), vql.Key("B")}, t1, 25},
 		{vql.Seq{vql.Key("T"), vql.Key("C")}, t1, nil},
 		{vql.Seq{vql.Key("T"), vql.Key("T")}, t1, (*thingy)(nil)},
+		{vql.Keys("T", "A"), t1, "bar"},
+		{vql.Keys("T", "B"), t1, 25},
+		{vql.Keys("T", "C"), t1, nil},
+		{vql.Keys("T", "T"), t1, (*thingy)(nil)},
 
 		{vql.Each(vql.Key("A")), []*thingy{&t1, t2}, []interface{}{"foo", "bar"}},
 

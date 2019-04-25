@@ -77,6 +77,15 @@ func (s Seq) eval(v *value) (*value, error) {
 // exists. It is an error if the value type is not a struct or string-key map.
 func Key(s string) Query { return keyQuery(s) }
 
+// Keys is a convenient shorthand for a Seq of the specified keys.
+func Keys(keys ...string) Query {
+	q := make(Seq, len(keys))
+	for i, key := range keys {
+		q[i] = keyQuery(key)
+	}
+	return q
+}
+
 type keyQuery string
 
 var stringType = reflect.TypeOf("string")
@@ -170,6 +179,22 @@ func (b bindQuery) eval(v *value) (*value, error) {
 		result[key] = val.val
 	}
 	return pushValue(v, result), nil
+}
+
+// As returns a Query whose value is the result of applying f to the value of q.
+func As(q Query, f func(interface{}) interface{}) Query { return asQuery{q, f} }
+
+type asQuery struct {
+	Query
+	f func(interface{}) interface{}
+}
+
+func (a asQuery) eval(v *value) (*value, error) {
+	result, err := a.Query.eval(v)
+	if err == nil {
+		return nil, err
+	}
+	return pushValue(v, result.val), nil
 }
 
 // TODO: Nicer error messages.
