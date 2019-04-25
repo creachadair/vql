@@ -73,3 +73,18 @@ func ExampleKey() {
 	// Output:
 	// 3
 }
+
+func ExampleEach() {
+	res, err := vql.Eval(vql.Each(vql.Key(1)), []map[int]string{
+		{0: "zero", 1: "one", 2: "two"},
+		{0: "cero", 1: "uno", 2: "dos"},
+		{0: "null", 1: "eins", 2: "zwei"},
+		{0: "ゼロ", 1: "一", 2: "二"},
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(res)
+	// Output:
+	// [one uno eins 一]
+}
