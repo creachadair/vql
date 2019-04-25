@@ -31,14 +31,16 @@ func ExampleEval() {
 		},
 	}
 
+	isExec := func(obj interface{}) interface{} {
+		s := obj.(string)
+		return len(s) == 3 && s[0] == 'C' && s[2] == 'O'
+	}
+
 	// A query to select the names of executives, identified by their title
-	// being "CEO" or "CFO".
+	// being "CxO".
 	execNames := vql.Seq{
 		vql.Key("People"),
-		vql.Select(vql.Key("Title"), func(obj interface{}) bool {
-			s := obj.(string)
-			return s == "CEO" || s == "CFO"
-		}),
+		vql.Select(vql.Seq{vql.Key("Title"), vql.As(isExec)}),
 		vql.Each(vql.Key("Name")),
 	}
 
@@ -91,8 +93,13 @@ func ExampleEach() {
 }
 
 func ExampleSelect() {
-	res, err := vql.Eval(vql.Select(vql.Key("age"), func(obj interface{}) bool {
+	isPresidential := func(obj interface{}) interface{} {
 		return obj.(int) > 35
+	}
+
+	res, err := vql.Eval(vql.Select(vql.Seq{
+		vql.Key("age"),
+		vql.As(isPresidential),
 	}), []map[string]int{
 		{"age": 19, "id": 10332, "height": 180},
 		{"age": 39, "id": 10335, "height": 143},

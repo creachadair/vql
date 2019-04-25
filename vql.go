@@ -152,24 +152,26 @@ func (m mapQuery) eval(v *value) (*value, error) {
 	return pushValue(v, vs), err
 }
 
-// Select returns a Query that applies f to result of evaluating q for each
-// entry in an array or slice, and yields a slice of concrete type
-// []interface{} containing the values for which f reports true.
-func Select(q Query, f func(interface{}) bool) Query { return selectQuery{q, f} }
+// Select returns a Query that evaluates q for each entry in an array or slice,
+// and yields a slice of concrete type []interface{} containing the entries for
+// which the value of q on that entry is true. It is an error if q does not
+// yield a bool.
+func Select(q Query) Query { return selectQuery{q} }
 
 type selectQuery struct {
 	Query
-	keep func(interface{}) bool
 }
 
 func (s selectQuery) eval(v *value) (*value, error) {
 	var vs []interface{}
 	err := forEach(v.val, func(obj interface{}) error {
-		v, err := s.Query.eval(pushValue(v, obj))
+		v, err := s.Query.eval(newValue(obj))
 		if err != nil {
 			return err
-		} else if s.keep(v.val) {
-			vs = append(vs, obj)
+		} else if keep, ok := v.val.(bool); !ok {
+			return fmt.Errorf("select query yielded %T, not bool", v.val)
+		} else if keep {
+			vs = append(vs, obj) // N.B. keep the subquery input, not the result
 		}
 		return nil
 	})

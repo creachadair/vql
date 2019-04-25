@@ -78,10 +78,9 @@ func TestQueries(t *testing.T) {
 
 		{vql.Seq{
 			vql.Key("S"),
-			vql.Select(vql.Self, func(obj interface{}) bool {
-				s, ok := obj.(string)
-				return ok && strings.HasPrefix(s, "p")
-			}),
+			vql.Select(vql.As(func(obj interface{}) interface{} {
+				return strings.HasPrefix(obj.(string), "p")
+			})),
 		}, t1, []interface{}{"pear", "plum"}},
 
 		{vql.Bind(map[string]vql.Query{
