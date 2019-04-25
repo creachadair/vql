@@ -59,3 +59,17 @@ func ExampleEval() {
 	// All execs: [Alice Dave]
 	// First exec: Alice
 }
+
+func ExampleKey() {
+	res, err := vql.Eval(vql.Key("three"), map[string]int{
+		"one":   1,
+		"two":   2,
+		"three": 3,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(res)
+	// Output:
+	// 3
+}
