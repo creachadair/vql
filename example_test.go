@@ -130,10 +130,11 @@ func ExampleBind() {
 	// Address 129.170.16.50, port 75
 }
 
-func ExampleWith() {
-	res, err := vql.Eval(vql.With(vql.Self, func(obj interface{}) interface{} {
+func ExampleAs() {
+	cleanString := func(obj interface{}) interface{} {
 		return strings.Join(strings.Fields(obj.(string)), " ")
-	}), " a messy\n \t string\n\n")
+	}
+	res, err := vql.Eval(vql.As(vql.Self, cleanString), " a messy\n \t string\n\n")
 	if err != nil {
 		log.Fatal(err)
 	}

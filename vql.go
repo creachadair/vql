@@ -18,7 +18,7 @@
 //
 // To extract subqueries from a value, use vql.Bind.
 //
-// To apply a functional transformation to a value, use vql.With.
+// To apply a functional transformation to a value, use vql.As.
 //
 // To construct a list of subquery values, use vql.List.
 //
@@ -196,15 +196,15 @@ func (b bindQuery) eval(v *value) (*value, error) {
 	return pushValue(v, result), nil
 }
 
-// With returns a Query whose value is the result of applying f to the value of q.
-func With(q Query, f func(interface{}) interface{}) Query { return withQuery{q, f} }
+// As returns a Query whose value is the result of applying f to the value of q.
+func As(q Query, f func(interface{}) interface{}) Query { return asQuery{q, f} }
 
-type withQuery struct {
+type asQuery struct {
 	Query
 	f func(interface{}) interface{}
 }
 
-func (w withQuery) eval(v *value) (*value, error) {
+func (w asQuery) eval(v *value) (*value, error) {
 	result, err := w.Query.eval(v)
 	if err != nil {
 		return nil, err
