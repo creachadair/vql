@@ -141,3 +141,13 @@ func ExampleWith() {
 	// Output:
 	// a messy string
 }
+
+func ExampleIndex() {
+	res, err := vql.Eval(vql.Index(2), []int{2, 3, 5, 7, 11, 13})
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(res)
+	// Output:
+	// 5
+}
