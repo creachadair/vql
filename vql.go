@@ -226,6 +226,22 @@ func (o Or) eval(v *value) (*value, error) {
 	return pushValue(v, nil), nil
 }
 
+// List is a Query that accumulates the values of the given queries in a slice
+// of type []interface{}. If no queries are given, the slice is empty.
+type List []Query
+
+func (q List) eval(v *value) (*value, error) {
+	var vs []interface{}
+	for _, elt := range q {
+		next, err := elt.eval(v)
+		if err != nil {
+			return nil, err
+		}
+		vs = append(vs, next.val)
+	}
+	return pushValue(v, vs), nil
+}
+
 func forEach(v interface{}, f func(interface{}) error) error {
 	rv, err := seqValue(v)
 	if err != nil {

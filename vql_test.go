@@ -90,6 +90,14 @@ func TestQueries(t *testing.T) {
 			vql.Index(1),      // non-nil value, selected
 			vql.Const("whee"), // unevaluated
 		}, []string{"all", "bears", "chug", "diesel"}, "bears"},
+
+		{vql.List(nil), t1, []interface{}(nil)},
+		{vql.List{}, t1, []interface{}(nil)},
+		{vql.List{
+			vql.Keys("T", "A"),
+			vql.Key("B"),
+			vql.Seq{vql.Key("S"), vql.Index(1)},
+		}, t1, []interface{}{"bar", 17, "plum"}},
 	}
 	for _, test := range tests {
 		got, err := vql.Eval(test.query, test.input)
