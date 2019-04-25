@@ -191,10 +191,10 @@ type asQuery struct {
 
 func (a asQuery) eval(v *value) (*value, error) {
 	result, err := a.Query.eval(v)
-	if err == nil {
+	if err != nil {
 		return nil, err
 	}
-	return pushValue(v, result.val), nil
+	return pushValue(v, a.f(result.val)), nil
 }
 
 // TODO: Nicer error messages.

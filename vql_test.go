@@ -76,6 +76,11 @@ func TestQueries(t *testing.T) {
 			"first":  vql.Key("B"),
 			"second": vql.Seq{vql.Key("T"), vql.Key("B")},
 		}), t1, map[string]interface{}{"first": 17, "second": 25}},
+
+		{vql.Each(vql.As(vql.Key("B"), func(obj interface{}) interface{} {
+			v, ok := obj.(int)
+			return ok && v > 20
+		})), []*thingy{&t1, t2}, []bool{false, true}},
 	}
 	for _, test := range tests {
 		got, err := vql.Eval(test.query, test.input)
