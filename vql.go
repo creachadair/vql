@@ -197,9 +197,9 @@ func Index(i int) Query { return indexQuery(i) }
 type indexQuery int
 
 func (q indexQuery) eval(v *value) (*value, error) {
-	rv := reflect.ValueOf(v.val)
-	if k := rv.Kind(); k != reflect.Array && k != reflect.Slice {
-		return nil, fmt.Errorf("value of type %T is not an array or slice", v)
+	rv, err := seqValue(v.val)
+	if err != nil {
+		return nil, err
 	}
 	offset := int(q)
 	if offset < 0 {
@@ -214,9 +214,9 @@ func (q indexQuery) eval(v *value) (*value, error) {
 // TODO: Nicer error messages.
 
 func forEach(v interface{}, f func(interface{}) error) error {
-	rv := reflect.ValueOf(v)
-	if k := rv.Kind(); k != reflect.Array && k != reflect.Slice {
-		return fmt.Errorf("value of type %T is not an array or slice", v)
+	rv, err := seqValue(v)
+	if err != nil {
+		return err
 	}
 	for i := 0; i < rv.Len(); i++ {
 		if err := f(rv.Index(i).Interface()); err != nil {
@@ -224,4 +224,12 @@ func forEach(v interface{}, f func(interface{}) error) error {
 		}
 	}
 	return nil
+}
+
+func seqValue(v interface{}) (reflect.Value, error) {
+	rv := reflect.ValueOf(v)
+	if k := rv.Kind(); k != reflect.Array && k != reflect.Slice {
+		return reflect.Value{}, fmt.Errorf("value of type %T is not an array or slice", v)
+	}
+	return rv, nil
 }
