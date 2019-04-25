@@ -151,3 +151,17 @@ func ExampleIndex() {
 	// Output:
 	// 5
 }
+
+func ExampleOr() {
+	res, err := vql.Eval(vql.Or{
+		vql.Key("cheese"), // wrong type, not selected
+		vql.Index(1),      // match
+		vql.Index(-1),     // match but not evaluted
+	}, []string{"some", "settling", "may", "occur"})
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(res)
+	// Output:
+	// settling
+}
