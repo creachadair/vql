@@ -109,3 +109,22 @@ func ExampleSelect() {
 	// Age 39 years, ID 10335, height 143 cm
 	// Age 65 years, ID 7153, height 182 cm
 }
+
+func ExampleBind() {
+	type Client struct {
+		Name string
+		Port int
+		IP   string
+	}
+	res, err := vql.Eval(vql.Bind(map[string]vql.Query{
+		"address": vql.Key("IP"),
+		"port":    vql.Key("Port"),
+	}), Client{Name: "X", Port: 75, IP: "129.170.16.50"})
+	if err != nil {
+		log.Fatal(err)
+	}
+	m := res.(map[string]interface{})
+	fmt.Printf("Address %s, port %d\n", m["address"], m["port"])
+	// Output:
+	// Address 129.170.16.50, port 75
+}
