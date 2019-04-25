@@ -152,19 +152,6 @@ func (s selectQuery) eval(v *value) (*value, error) {
 	return pushValue(v, vs), err
 }
 
-func forEach(v interface{}, f func(interface{}) error) error {
-	rv := reflect.ValueOf(v)
-	if k := rv.Kind(); k != reflect.Array && k != reflect.Slice {
-		return fmt.Errorf("value of type %T is not an array or slice", v)
-	}
-	for i := 0; i < rv.Len(); i++ {
-		if err := f(rv.Index(i).Interface()); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
 // Bind returns a Query that binds the values from the specified subqueries to
 // the corresponding keys in a string-to-value map.  The concrete type of the
 // result is map[string]interface{}. It is not an error for requested values to
@@ -202,3 +189,16 @@ func (a asQuery) eval(v *value) (*value, error) {
 }
 
 // TODO: Nicer error messages.
+
+func forEach(v interface{}, f func(interface{}) error) error {
+	rv := reflect.ValueOf(v)
+	if k := rv.Kind(); k != reflect.Array && k != reflect.Slice {
+		return fmt.Errorf("value of type %T is not an array or slice", v)
+	}
+	for i := 0; i < rv.Len(); i++ {
+		if err := f(rv.Index(i).Interface()); err != nil {
+			return err
+		}
+	}
+	return nil
+}
