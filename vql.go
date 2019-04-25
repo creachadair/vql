@@ -7,7 +7,7 @@
 // traversal and filtering of array/slice values, and extraction of
 // substructures.
 //
-// TODO: Implement additional interesting query operators.
+// TODO: Add more descriptive errors.
 package vql
 
 import (
@@ -210,8 +210,6 @@ func (q indexQuery) eval(v *value) (*value, error) {
 	}
 	return pushValue(v, rv.Index(offset).Interface()), nil
 }
-
-// TODO: Nicer error messages.
 
 func forEach(v interface{}, f func(interface{}) error) error {
 	rv, err := seqValue(v)
