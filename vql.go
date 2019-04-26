@@ -3,6 +3,14 @@
 // value (struct, slice, map). For a value v, vql.Eval(q, v) performs the steps
 // described by q starting at v, and reports the value obtained.
 //
+// Purpose
+//
+// Decoding loosely-structured data such as JSON or YAML often produces dynamic
+// structures that are highly nested and can be inconvenient to traverse. A
+// vql.Query makes it easier to pick out only the pieces of the value relevant
+// to your particular task. This can be helpful even the type of the structure
+// is statically known, as in the case of complex configuration scripts.
+//
 // Queries
 //
 // To fetch a named field from a struct, or the value from a map, use vql.Key.
