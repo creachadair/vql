@@ -20,7 +20,8 @@
 //
 // To apply a functional transformation to a value, use vql.As.
 //
-// To construct a list of subquery values, use vql.List.
+// To construct a list of subquery values, use vql.List, or vql.Cat to flatten
+// list-valued subqueries.
 //
 // To select one of a sequence of subqueries to apply, use vql.Or.
 //
@@ -256,6 +257,30 @@ func (q List) eval(v *value) (*value, error) {
 			return nil, err
 		}
 		vs = append(vs, next.val)
+	}
+	return pushValue(v, vs), nil
+}
+
+// Cat is a Query that accumulates the values of the given queries in a slice
+// of type []interface{}. The contents of array or slice values are flattened.
+// If no queries are given, or if all values are empty, the result is empty.
+type Cat []Query
+
+func (c Cat) eval(v *value) (*value, error) {
+	var vs []interface{}
+	for _, elt := range c {
+		next, err := elt.eval(v)
+		if err != nil {
+			return nil, err
+		}
+		rv := reflect.ValueOf(next.val)
+		if k := rv.Kind(); k == reflect.Slice || k == reflect.Array {
+			for i := 0; i < rv.Len(); i++ {
+				vs = append(vs, rv.Index(i).Interface())
+			}
+		} else {
+			vs = append(vs, next.val)
+		}
 	}
 	return pushValue(v, vs), nil
 }

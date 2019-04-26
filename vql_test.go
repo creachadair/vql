@@ -106,6 +106,20 @@ func TestQueries(t *testing.T) {
 			vql.Key("B"),
 			vql.Seq{vql.Key("S"), vql.Index(1)},
 		}, t1, []interface{}{"bar", 17, "plum"}},
+		{vql.List{
+			vql.Keys("T", "A"),
+			vql.Keys("T", "S"),
+			vql.Key("B"),
+		}, t1, []interface{}{"bar", []string{"apple", "pie"}, 17}},
+
+		{vql.Cat(nil), "whatever", []interface{}{}},
+		{vql.Cat{}, "whatever", []interface{}{}},
+		{vql.Cat{
+			vql.Key("A"),
+			vql.Keys("T", "B"),
+			vql.Key("S"),
+			vql.Keys("T", "S"),
+		}, t1, []interface{}{"foo", 25, "pear", "plum", "cherry", "apple", "pie"}},
 	}
 	for _, test := range tests {
 		got, err := vql.Eval(test.query, test.input)

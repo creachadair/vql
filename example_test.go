@@ -186,3 +186,19 @@ func ExampleList() {
 	// Output:
 	// [true false]
 }
+
+func ExampleCat() {
+	res, err := vql.Eval(vql.Cat{
+		vql.Key("xyz"),
+		vql.Key("pdq"),
+	}, map[string]interface{}{
+		"xyz": "some",
+		"pdq": []string{"assembly", "required"},
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(res)
+	// Output:
+	// [some assembly required]
+}
