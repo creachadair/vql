@@ -5,7 +5,8 @@ import (
 	"testing"
 
 	"bitbucket.org/creachadair/vql"
-	"github.com/kylelemons/godebug/pretty"
+	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
 func TestQueries(t *testing.T) {
@@ -90,7 +91,7 @@ func TestQueries(t *testing.T) {
 
 		{vql.Each(vql.Seq{vql.Key("B"), vql.As(func(obj interface{}) interface{} {
 			return obj.(int) > 20
-		})}), []*thingy{&t1, t2}, []bool{false, true}},
+		})}), []*thingy{&t1, t2}, []interface{}{false, true}},
 
 		{vql.Or{
 			vql.Index(10),     // error, ignored
@@ -125,8 +126,8 @@ func TestQueries(t *testing.T) {
 		got, err := vql.Eval(test.query, test.input)
 		if err != nil {
 			t.Errorf("Eval(%v): unexpected error: %v", test.query, err)
-		} else if diff := pretty.Compare(got, test.want); diff != "" {
-			t.Errorf("Eval(%v): (-got, +want)\n%s", test.query, diff)
+		} else if diff := cmp.Diff(test.want, got, cmpopts.EquateEmpty()); diff != "" {
+			t.Errorf("Eval(%v): (-want, +got)\n%s", test.query, diff)
 		}
 	}
 }
