@@ -115,6 +115,10 @@ func TestQueries(t *testing.T) {
 
 		{vql.Cat(nil), "whatever", []interface{}{}},
 		{vql.Cat{}, "whatever", []interface{}{}},
+		{vql.Cat{vql.Const("x")}, "whatever", []interface{}{"x"}},
+		{vql.Cat{vql.Self}, "x", []interface{}{"x"}},
+		{vql.Cat{vql.Self}, []interface{}{"x"}, []interface{}{"x"}},
+		{vql.Cat{vql.Self}, []string{"a", "b"}, []interface{}{"a", "b"}},
 		{vql.Cat{
 			vql.Key("A"),
 			vql.Keys("T", "B"),
