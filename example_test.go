@@ -8,6 +8,42 @@ import (
 	"bitbucket.org/creachadair/vql"
 )
 
+func ExampleEval_variant() {
+	// For this example we consider types that have a similar structure, both
+	// have a Name field and a Boolean property but are not identical.
+	type Animal struct {
+		Name  string
+		Alive bool
+	}
+	type Person struct {
+		Name     string
+		Age      int
+		Employed bool
+	}
+
+	inputs := []interface{}{
+		Animal{Name: "aardvark", Alive: true},
+		Person{Name: "alice", Age: 25, Employed: false},
+		Person{Name: "bob", Age: 38, Employed: true},
+		Animal{Name: "boar", Alive: false},
+	}
+
+	// Select values whose bool-containing field is true, and pull out the
+	// corresponding name.
+	query := vql.Seq{
+		vql.Select(vql.Or{vql.Key("Alive"), vql.Key("Employed")}),
+		vql.Each(vql.Key("Name")),
+	}
+
+	res, err := vql.Eval(query, inputs)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(res)
+	// Output:
+	// [aardvark bob]
+}
+
 func ExampleEval() {
 	type Person struct {
 		Name  string
