@@ -76,7 +76,7 @@ func ExampleEval() {
 	// being "CxO".
 	execNames := vql.Seq{
 		vql.Key("People"),
-		vql.Select(vql.Seq{vql.Key("Title"), vql.As(isExec)}),
+		vql.Select(vql.Key("Title"), vql.As(isExec)),
 		vql.Each(vql.Key("Name")),
 	}
 
@@ -133,10 +133,10 @@ func ExampleSelect() {
 		return obj.(int) > 35
 	}
 
-	res, err := vql.Eval(vql.Select(vql.Seq{
+	res, err := vql.Eval(vql.Select(
 		vql.Key("age"),
 		vql.As(isPresidential),
-	}), []map[string]int{
+	), []map[string]int{
 		{"age": 19, "id": 10332, "height": 180},
 		{"age": 39, "id": 10335, "height": 143},
 		{"age": 34, "id": 92131, "height": 139},

@@ -168,7 +168,7 @@ func (m mapQuery) eval(v *value) (*value, error) {
 // and yields a slice of concrete type []interface{} containing the entries for
 // which the value of q on that entry is true. It is an error if q does not
 // yield a bool.
-func Select(q Query) Query { return selectQuery{q} }
+func Select(q ...Query) Query { return selectQuery{Seq(q)} }
 
 type selectQuery struct {
 	Query
