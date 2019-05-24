@@ -211,12 +211,12 @@ func (b bindQuery) eval(v *value) (*value, error) {
 	return pushValue(v, result), nil
 }
 
-// As returns a Query whose value is the result of applying f to its input.
-func As(f Transform) Query { return asQuery(f) }
+// Func returns a Query whose value is the result of applying f to its input.
+func Func(f Transform) Query { return fnQuery(f) }
 
-type asQuery Transform
+type fnQuery Transform
 
-func (a asQuery) eval(v *value) (*value, error) { return pushValue(v, a(v.val)), nil }
+func (a fnQuery) eval(v *value) (*value, error) { return pushValue(v, a(v.val)), nil }
 
 // Index returns a Query that selects the item at a specified offset in an
 // array or slice. Offsets are 0-based, with negative offsets referring to

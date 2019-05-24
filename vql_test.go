@@ -52,8 +52,8 @@ func TestQueries(t *testing.T) {
 		{vql.Key("B"), t1, 17},
 		{vql.Key("S"), t1, []string{"pear", "plum", "cherry"}},
 		{vql.Key("C"), t1, nil},
-		{vql.Seq{vql.Key("C"), vql.As(vql.IsNil)}, t1, true},
-		{vql.Seq{vql.Key("C"), vql.As(vql.NotNil)}, t1, false},
+		{vql.Seq{vql.Key("C"), vql.Func(vql.IsNil)}, t1, true},
+		{vql.Seq{vql.Key("C"), vql.Func(vql.NotNil)}, t1, false},
 
 		{vql.Key("oh"), sm, "bother"},
 		{vql.Key("piglet"), sm, nil},
@@ -79,7 +79,7 @@ func TestQueries(t *testing.T) {
 
 		{vql.Seq{
 			vql.Key("S"),
-			vql.Select(vql.As(func(obj interface{}) interface{} {
+			vql.Select(vql.Func(func(obj interface{}) interface{} {
 				return strings.HasPrefix(obj.(string), "p")
 			})),
 		}, t1, []interface{}{"pear", "plum"}},
@@ -89,7 +89,7 @@ func TestQueries(t *testing.T) {
 			"second": vql.Seq{vql.Key("T"), vql.Key("B")},
 		}), t1, map[string]interface{}{"first": 17, "second": 25}},
 
-		{vql.Each(vql.Seq{vql.Key("B"), vql.As(func(obj interface{}) interface{} {
+		{vql.Each(vql.Seq{vql.Key("B"), vql.Func(func(obj interface{}) interface{} {
 			return obj.(int) > 20
 		})}), []*thingy{&t1, t2}, []interface{}{false, true}},
 

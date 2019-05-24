@@ -76,7 +76,7 @@ func ExampleEval() {
 	// being "CxO".
 	execNames := vql.Seq{
 		vql.Key("People"),
-		vql.Select(vql.Key("Title"), vql.As(isExec)),
+		vql.Select(vql.Key("Title"), vql.Func(isExec)),
 		vql.Each(vql.Key("Name")),
 	}
 
@@ -135,7 +135,7 @@ func ExampleSelect() {
 
 	res, err := vql.Eval(vql.Select(
 		vql.Key("age"),
-		vql.As(isPresidential),
+		vql.Func(isPresidential),
 	), []map[string]int{
 		{"age": 19, "id": 10332, "height": 180},
 		{"age": 39, "id": 10335, "height": 143},
@@ -173,11 +173,11 @@ func ExampleBind() {
 	// Address 129.170.16.50, port 75
 }
 
-func ExampleAs() {
+func ExampleFunc() {
 	cleanString := func(obj interface{}) interface{} {
 		return strings.Join(strings.Fields(obj.(string)), " ")
 	}
-	res, err := vql.Eval(vql.As(cleanString), " a messy\n \t string\n\n")
+	res, err := vql.Eval(vql.Func(cleanString), " a messy\n \t string\n\n")
 	if err != nil {
 		log.Fatal(err)
 	}
