@@ -17,7 +17,7 @@
 // Queries
 //
 // To fetch a named field from a struct, or the value from a map, use vql.Key.
-// Compound lookups can be chained with vql.Keys.
+// You can supply multiple keys to do compound lookups.
 //
 // To index into a slice of values, use vql.Index.
 //
@@ -105,16 +105,14 @@ func (s Seq) eval(v *value) (*value, error) {
 	return v, nil
 }
 
-// Key returns a Query that returns the value of the specified field on a
-// struct, or entry in a map, or nil if no such field or key exists. It is an
-// error if the value type is not a struct or a map with a compatible key type.
-func Key(key interface{}) Query { return keyQuery{key: key} }
-
-// Keys is a convenience shorthand for a Seq of the specified keys.
-func Keys(keys ...interface{}) Query {
+// Key returns a Query that returns the value of the specified sequence of
+// field lookups on a struct, or entry in a map. The result is nil if no such
+// field or key exists. It is an error if the value type is not a struct or a
+// map with a compatible key type.
+func Key(keys ...interface{}) Query {
 	q := make(Seq, len(keys))
 	for i, key := range keys {
-		q[i] = Key(key)
+		q[i] = keyQuery{key: key}
 	}
 	return q
 }

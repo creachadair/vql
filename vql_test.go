@@ -67,14 +67,14 @@ func TestQueries(t *testing.T) {
 		{vql.Seq{vql.Key("T"), vql.Key("B")}, t1, 25},
 		{vql.Seq{vql.Key("T"), vql.Key("C")}, t1, nil},
 		{vql.Seq{vql.Key("T"), vql.Key("T")}, t1, (*thingy)(nil)},
-		{vql.Keys("T", "A"), t1, "bar"},
-		{vql.Keys("T", "B"), t1, 25},
-		{vql.Keys("T", "C"), t1, nil},
-		{vql.Keys("T", "T"), t1, (*thingy)(nil)},
+		{vql.Key("T", "A"), t1, "bar"},
+		{vql.Key("T", "B"), t1, 25},
+		{vql.Key("T", "C"), t1, nil},
+		{vql.Key("T", "T"), t1, (*thingy)(nil)},
 
 		{vql.Each(vql.Key("A")), []*thingy{&t1, t2}, []interface{}{"foo", "bar"}},
 
-		{vql.Seq{vql.Keys("T", "S"), vql.Index(-1)}, t1, "pie"},
+		{vql.Seq{vql.Key("T", "S"), vql.Index(-1)}, t1, "pie"},
 		{vql.Seq{vql.Key("S"), vql.Index(1)}, t1, "plum"},
 
 		{vql.Seq{
@@ -103,13 +103,13 @@ func TestQueries(t *testing.T) {
 		{vql.List(nil), t1, []interface{}(nil)},
 		{vql.List{}, t1, []interface{}(nil)},
 		{vql.List{
-			vql.Keys("T", "A"),
+			vql.Key("T", "A"),
 			vql.Key("B"),
 			vql.Seq{vql.Key("S"), vql.Index(1)},
 		}, t1, []interface{}{"bar", 17, "plum"}},
 		{vql.List{
-			vql.Keys("T", "A"),
-			vql.Keys("T", "S"),
+			vql.Key("T", "A"),
+			vql.Key("T", "S"),
 			vql.Key("B"),
 		}, t1, []interface{}{"bar", []string{"apple", "pie"}, 17}},
 
@@ -121,9 +121,9 @@ func TestQueries(t *testing.T) {
 		{vql.Cat{vql.Self}, []string{"a", "b"}, []interface{}{"a", "b"}},
 		{vql.Cat{
 			vql.Key("A"),
-			vql.Keys("T", "B"),
+			vql.Key("T", "B"),
 			vql.Key("S"),
-			vql.Keys("T", "S"),
+			vql.Key("T", "S"),
 		}, t1, []interface{}{"foo", 25, "pear", "plum", "cherry", "apple", "pie"}},
 	}
 	for _, test := range tests {
