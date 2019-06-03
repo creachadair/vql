@@ -209,12 +209,52 @@ func (b bindQuery) eval(v *value) (*value, error) {
 	return pushValue(v, result), nil
 }
 
-// Func returns a Query whose value is the result of applying f to its input.
-func Func(f Transform) Query { return fnQuery(f) }
+// Func returns a Query whose value is the result of applying a function v to
+// its input. The value of v must have one of the following signatures:
+//
+//     func(T) U
+//     func(T) (U, error)
+//
+// Otherwise, Func will panic. If v has the second form and reports an error,
+// that error is propagated through the query chain.
+func Func(v interface{}) Query {
+	fn := reflect.ValueOf(v)
+	t := fn.Type()
+	switch {
+	case t.Kind() != reflect.Func:
+		panic("func: value is not a function")
+	case t.NumIn() != 1:
+		panic("func: wrong number of arguments")
+	case t.NumOut() < 1, t.NumOut() > 2:
+		panic("func: wrong number of returns")
+	case t.NumOut() == 2 && t.Out(1) != errType:
+		panic("func: last return value is not error")
+	}
+	return fnQuery{fn: fn, argType: t.In(0)}
+}
 
-type fnQuery Transform
+var errType = reflect.TypeOf((*error)(nil)).Elem()
 
-func (a fnQuery) eval(v *value) (*value, error) { return pushValue(v, a(v.val)), nil }
+type fnQuery struct {
+	fn      reflect.Value
+	argType reflect.Type
+}
+
+func (a fnQuery) eval(v *value) (*value, error) {
+	arg := reflect.ValueOf(v.val)
+	if !arg.IsValid() {
+		arg = reflect.New(a.argType).Elem()
+	} else if !arg.Type().AssignableTo(a.argType) {
+		return nil, fmt.Errorf("argument %T is not assignable to %v", v.val, a.argType)
+	}
+	res := a.fn.Call([]reflect.Value{arg})
+	if len(res) == 2 {
+		if err := res[1].Interface(); err != nil {
+			return nil, err.(error)
+		}
+	}
+	return pushValue(v, res[0].Interface()), nil
+}
 
 // Index returns a Query that selects the item at a specified offset in an
 // array or slice. Offsets are 0-based, with negative offsets referring to
@@ -314,3 +354,9 @@ func seqValue(v interface{}) (reflect.Value, error) {
 	}
 	return rv, nil
 }
+
+// IsNil is a Func that reports whether obj is nil, as a bool.
+func IsNil(obj interface{}) bool { return obj == nil }
+
+// NotNil is a Func that reports whether obj is non-nil, as a bool.
+func NotNil(obj interface{}) bool { return obj != nil }

@@ -1,6 +1,7 @@
 package vql_test
 
 import (
+	"errors"
 	"strings"
 	"testing"
 
@@ -79,8 +80,8 @@ func TestQueries(t *testing.T) {
 
 		{vql.Seq{
 			vql.Key("S"),
-			vql.Select(vql.Func(func(obj interface{}) interface{} {
-				return strings.HasPrefix(obj.(string), "p")
+			vql.Select(vql.Func(func(s string) bool {
+				return strings.HasPrefix(s, "p")
 			})),
 		}, t1, []interface{}{"pear", "plum"}},
 
@@ -89,8 +90,8 @@ func TestQueries(t *testing.T) {
 			"second": vql.Seq{vql.Key("T"), vql.Key("B")},
 		}), t1, map[string]interface{}{"first": 17, "second": 25}},
 
-		{vql.Each(vql.Seq{vql.Key("B"), vql.Func(func(obj interface{}) interface{} {
-			return obj.(int) > 20
+		{vql.Each(vql.Seq{vql.Key("B"), vql.Func(func(v int) bool {
+			return v > 20
 		})}), []*thingy{&t1, t2}, []interface{}{false, true}},
 
 		{vql.Or{
@@ -99,6 +100,18 @@ func TestQueries(t *testing.T) {
 			vql.Index(1),      // non-nil value, selected
 			vql.Const("whee"), // unevaluated
 		}, []string{"all", "bears", "chug", "diesel"}, "bears"},
+
+		{vql.Seq{
+			vql.Key("S"),
+			vql.Or{
+				// Verify that a two-result function with an error gets propagated
+				// when it fails.
+				vql.Func(func(ss []string) (string, error) {
+					return "", errors.New("I say no thank you sir")
+				}),
+				vql.Index(2),
+			},
+		}, t1, "cherry"},
 
 		{vql.List(nil), t1, []interface{}(nil)},
 		{vql.List{}, t1, []interface{}(nil)},
