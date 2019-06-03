@@ -67,8 +67,7 @@ func ExampleEval() {
 		},
 	}
 
-	isExec := func(obj interface{}) interface{} {
-		s := obj.(string)
+	isExec := func(s string) bool {
 		return len(s) == 3 && s[0] == 'C' && s[2] == 'O'
 	}
 
@@ -129,9 +128,7 @@ func ExampleEach() {
 }
 
 func ExampleSelect() {
-	isPresidential := func(obj interface{}) interface{} {
-		return obj.(int) > 35
-	}
+	isPresidential := func(age int) bool { return age > 35 }
 
 	res, err := vql.Eval(vql.Select(
 		vql.Key("age"),
@@ -174,8 +171,8 @@ func ExampleBind() {
 }
 
 func ExampleFunc() {
-	cleanString := func(obj interface{}) interface{} {
-		return strings.Join(strings.Fields(obj.(string)), " ")
+	cleanString := func(s string) string {
+		return strings.Join(strings.Fields(s), " ")
 	}
 	res, err := vql.Eval(vql.Func(cleanString), " a messy\n \t string\n\n")
 	if err != nil {
