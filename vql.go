@@ -188,18 +188,19 @@ func (s selectQuery) eval(v *value) (*value, error) {
 	return pushValue(v, vs), err
 }
 
-// Bind returns a Query that binds the values from the specified subqueries to
-// the corresponding keys in a string-to-value map.  The concrete type of the
-// result is map[string]interface{}, and the concrete type of each value is
-// whatever was expressed by the corresponding subquery. It is not an error for
-// requested values to be missing; their corresponding values will be nil.
-func Bind(m map[string]Query) Query { return bindQuery(m) }
+// Values represents the values bound by application of a Map query.
+type Values map[string]interface{}
 
-type bindQuery map[string]Query
+// A Map is a Query that binds the values from the specified subqueries to the
+// corresponding keys in a string-to-value map.  The concrete type of the
+// result is vql.Values, and the concrete type of each value is whatever was
+// expressed by the corresponding subquery. It is not an error for requested
+// values to be missing; their corresponding values will be nil.
+type Map map[string]Query
 
-func (b bindQuery) eval(v *value) (*value, error) {
-	result := make(map[string]interface{})
-	for key, q := range b {
+func (m Map) eval(v *value) (*value, error) {
+	result := make(Values)
+	for key, q := range m {
 		val, err := q.eval(v)
 		if err != nil {
 			return nil, fmt.Errorf("evaluating subquery %q: %v", key, err)

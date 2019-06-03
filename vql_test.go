@@ -85,10 +85,10 @@ func TestQueries(t *testing.T) {
 			})),
 		}, t1, []interface{}{"pear", "plum"}},
 
-		{vql.Bind(map[string]vql.Query{
+		{vql.Map{
 			"first":  vql.Key("B"),
 			"second": vql.Seq{vql.Key("T"), vql.Key("B")},
-		}), t1, map[string]interface{}{"first": 17, "second": 25}},
+		}, t1, vql.Values{"first": 17, "second": 25}},
 
 		{vql.Each(vql.Seq{vql.Key("B"), vql.Func(func(v int) bool {
 			return v > 20
