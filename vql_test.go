@@ -74,6 +74,12 @@ func TestQueries(t *testing.T) {
 		{vql.Key("T", "T"), t1, (*thingy)(nil)},
 
 		{vql.Each(vql.Key("A")), []*thingy{&t1, t2}, []interface{}{"foo", "bar"}},
+		{vql.Each(vql.Key("Key")), map[string]bool{"ok": true}, []interface{}{"ok"}},
+		{vql.Each(vql.Key("Value")), map[string]bool{"ok": true}, []interface{}{true}},
+		{vql.Seq{
+			vql.Select(vql.Key("Value"), vql.Func(func(z int) bool { return z == 4 })),
+			vql.Each(vql.Key("Key")),
+		}, map[string]int{"yes": 4, "sí": 3, "да": 2, "はい": 1}, []interface{}{"yes"}},
 
 		{vql.Seq{vql.Key("T", "S"), vql.Index(-1)}, t1, "pie"},
 		{vql.Seq{vql.Key("S"), vql.Index(1)}, t1, "plum"},

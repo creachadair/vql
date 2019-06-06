@@ -144,8 +144,10 @@ func (k keyQuery) eval(v *value) (*value, error) {
 	return pushValue(v, f.Interface()), nil
 }
 
-// Each returns a Query that applies q to each element of an array or slice,
-// and yields a slice of type []interface{} containing the resulting values.
+// Each returns a Query that applies q to each element of an array, slice, or
+// map, and yields a slice of type []interface{} containing the resulting
+// values. If the input value is a map, the selector is given inputs of
+// concrete type Entry.
 func Each(q Query) Query { return mapQuery{q} }
 
 type mapQuery struct{ Query }
@@ -162,10 +164,16 @@ func (m mapQuery) eval(v *value) (*value, error) {
 	return pushValue(v, vs), err
 }
 
-// Select returns a Query that evaluates q for each entry in an array or slice,
-// and yields a slice of concrete type []interface{} containing the entries for
-// which the value of q on that entry is true. It is an error if q does not
-// yield a bool.
+// Entry is the concrete type of input values to a selector query for a map.
+type Entry struct {
+	Key, Value interface{}
+}
+
+// Select returns a Query that evaluates q for each entry in an array, slice,
+// or map, and yields a slice of concrete type []interface{} containing the
+// entries for which the value of q on that entry is true. It is an error if q
+// does not yield a bool. If the input value is a map, tne selector is given
+// inputs of concrete type Entry.
 func Select(q ...Query) Query { return selectQuery{Seq(q)} }
 
 type selectQuery struct {
@@ -336,14 +344,25 @@ func (c Cat) eval(v *value) (*value, error) {
 }
 
 func forEach(v interface{}, f func(interface{}) error) error {
-	rv, err := seqValue(v)
-	if err != nil {
-		return err
-	}
-	for i := 0; i < rv.Len(); i++ {
-		if err := f(rv.Index(i).Interface()); err != nil {
-			return err
+	rv := reflect.ValueOf(v)
+	switch rv.Kind() {
+	case reflect.Array, reflect.Slice:
+		for i := 0; i < rv.Len(); i++ {
+			if err := f(rv.Index(i).Interface()); err != nil {
+				return err
+			}
 		}
+	case reflect.Map:
+		for _, key := range rv.MapKeys() {
+			if err := f(Entry{
+				Key:   key.Interface(),
+				Value: rv.MapIndex(key).Interface(),
+			}); err != nil {
+				return err
+			}
+		}
+	default:
+		return fmt.Errorf("value of type %T is not an array, map, or slice", v)
 	}
 	return nil
 }
