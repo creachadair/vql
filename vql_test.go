@@ -77,7 +77,7 @@ func TestQueries(t *testing.T) {
 		{vql.Each(vql.Key("Key")), map[string]bool{"ok": true}, []interface{}{"ok"}},
 		{vql.Each(vql.Key("Value")), map[string]bool{"ok": true}, []interface{}{true}},
 		{vql.Seq{
-			vql.Select(vql.Key("Value"), vql.Func(func(z int) bool { return z == 4 })),
+			vql.Select(vql.Key("Value"), vql.Eq(4)),
 			vql.Each(vql.Key("Key")),
 		}, map[string]int{"yes": 4, "sí": 3, "да": 2, "はい": 1}, []interface{}{"yes"}},
 

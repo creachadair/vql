@@ -343,6 +343,13 @@ func (c Cat) eval(v *value) (*value, error) {
 	return pushValue(v, vs), nil
 }
 
+// Eq returns a Query whose value reports whether the input equals needle.
+func Eq(needle interface{}) Query { return eqQuery{needle} }
+
+type eqQuery struct{ needle interface{} }
+
+func (q eqQuery) eval(v *value) (*value, error) { return pushValue(v, v.val == q.needle), nil }
+
 func forEach(v interface{}, f func(interface{}) error) error {
 	rv := reflect.ValueOf(v)
 	switch rv.Kind() {
