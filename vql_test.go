@@ -81,6 +81,20 @@ func TestQueries(t *testing.T) {
 			vql.Each(vql.Key("Key")),
 		}, map[string]int{"yes": 4, "sí": 3, "да": 2, "はい": 1}, []interface{}{"yes"}},
 
+		// Order comparisons.
+		{vql.Lt(25), 16, true},
+		{vql.Gt(25), 16, false},
+		{vql.Le(25), 16, true},
+		{vql.Ge(25), 16, false},
+		{vql.Lt(25), 25, false},
+		{vql.Gt(25), 25, false},
+		{vql.Le(25), 25, true},
+		{vql.Ge(25), 25, true},
+		{vql.Lt(25), 35, false},
+		{vql.Gt(25), 35, true},
+		{vql.Le(25), 35, false},
+		{vql.Ge(25), 35, true},
+
 		{vql.Seq{vql.Key("T", "S"), vql.Index(-1)}, t1, "pie"},
 		{vql.Seq{vql.Key("S"), vql.Index(1)}, t1, "plum"},
 

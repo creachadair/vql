@@ -343,12 +343,77 @@ func (c Cat) eval(v *value) (*value, error) {
 	return pushValue(v, vs), nil
 }
 
-// Eq returns a Query whose value reports whether the input equals needle.
-func Eq(needle interface{}) Query { return eqQuery{needle} }
+type cmpQuery func(*value) (bool, error)
 
-type eqQuery struct{ needle interface{} }
+func (c cmpQuery) eval(v *value) (*value, error) {
+	w, err := c(v)
+	if err != nil {
+		return nil, err
+	}
+	return pushValue(v, w), nil
+}
 
-func (q eqQuery) eval(v *value) (*value, error) { return pushValue(v, v.val == q.needle), nil }
+// Eq returns a Query that reports whether the input equals needle.
+func Eq(needle interface{}) Query {
+	return cmpQuery(func(v *value) (bool, error) { return v.val == needle, nil })
+}
+
+// Lt returns a Query that reports whether the input is less than needle.
+func Lt(needle interface{}) Query {
+	return cmpQuery(func(v *value) (bool, error) { return isLessThan(v.val, needle, false) })
+}
+
+// Le returns a Query that reports whether the input is less than or equal to needle.
+func Le(needle interface{}) Query {
+	return cmpQuery(func(v *value) (bool, error) { return isLessThan(v.val, needle, true) })
+}
+
+// Gt returns a Query that reports whether the input is greater than needle.
+func Gt(needle interface{}) Query {
+	return cmpQuery(func(v *value) (bool, error) { return isLessThan(needle, v.val, false) })
+}
+
+// Ge returns a Query that reports whether the input is greater than or equal to needle.
+func Ge(needle interface{}) Query {
+	return cmpQuery(func(v *value) (bool, error) { return isLessThan(needle, v.val, true) })
+}
+
+func isLessThan(x, y interface{}, ifEQ bool) (bool, error) {
+	if x == y {
+		return ifEQ, nil
+	}
+	vx, vy := reflect.ValueOf(x), reflect.ValueOf(y)
+	kx, ky := vx.Kind(), vy.Kind()
+	switch {
+	case isIntLike(kx) && isIntLike(ky):
+		return vx.Int() < vy.Int(), nil
+	case isUintLike(kx) && isUintLike(ky):
+		return vx.Uint() < vy.Uint(), nil
+	case kx == reflect.String && ky == reflect.String:
+		return vx.String() < vy.String(), nil
+	case isFloatLike(kx) && isFloatLike(ky):
+		return vx.Float() < vy.Float(), nil
+	}
+	return false, fmt.Errorf("cannot compare %T and %T", x, y)
+}
+
+func isIntLike(k reflect.Kind) bool {
+	switch k {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return true
+	}
+	return false
+}
+
+func isUintLike(k reflect.Kind) bool {
+	switch k {
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		return true
+	}
+	return false
+}
+
+func isFloatLike(k reflect.Kind) bool { return k == reflect.Float64 || k == reflect.Float32 }
 
 func forEach(v interface{}, f func(interface{}) error) error {
 	rv := reflect.ValueOf(v)
