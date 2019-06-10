@@ -1,4 +1,4 @@
-module bitbucket.org/creachadair/vql
+module github.com/creachadair/vql
 
 go 1.12
 

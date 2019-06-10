@@ -5,7 +5,7 @@ import (
 	"log"
 	"strings"
 
-	"bitbucket.org/creachadair/vql"
+	"github.com/creachadair/vql"
 )
 
 func ExampleEval_variant() {
