@@ -172,7 +172,7 @@ type Entry struct {
 // Select returns a Query that evaluates q for each entry in an array, slice,
 // or map, and yields a slice of concrete type []interface{} containing the
 // entries for which the value of q on that entry is true. It is an error if q
-// does not yield a bool. If the input value is a map, tne selector is given
+// does not yield a bool. If the input value is a map, the selector is given
 // inputs of concrete type Entry.
 func Select(q ...Query) Query { return selectQuery{Seq(q)} }
 
