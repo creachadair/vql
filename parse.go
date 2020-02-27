@@ -1,5 +1,10 @@
 package vql
 
+import (
+	"bufio"
+	"bytes"
+)
+
 /*
 Query grammar:
 
@@ -13,16 +18,16 @@ cat    = "#[" alts? "]"
 map    = "{" kvals? "}"
 kvals  = kval "," kvals?
 kval   = key ":" alt
-each   = "each" alt
-select = "select" alt
-func   = "?" name
+each   = "each" term
+select = "select" term
+func   = "@" name
 base   = atom | atom "[" int "]" | atom op atom
 atom   = const | name | quoted | hole | "(" alt ")"
-const  = string | int | float | bool 
+const  = string | int | float | bool
 quoted = "'" name
 key    = string | name
 op     = "==" | "<" | "<=" | ">" | ">="
-string = "\"" schars "\""
+string = "\"" schnars "\""
 hole   = "$" name
 
 type selfQuery struct{}
@@ -45,3 +50,8 @@ func Ge(needle interface{}) Query {
 func IsNil(obj interface{}) bool { return obj == nil }
 func NotNil(obj interface{}) bool { return obj != nil }
 */
+
+type parser struct {
+	buf *bufio.Reader
+	tok bytes.Buffer
+}
