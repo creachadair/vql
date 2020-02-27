@@ -7,25 +7,23 @@ query  = alt
 alt    = seq | seq "//" alt
 alts   = alt | alt "," alts   -- 1 or more
 seq    = term | term "." seq
-term   = atom | list | cat | map | each | select | index
+term   = base | list | cat | map | each | func | select
 list   = "[" alts? "]"
 cat    = "#[" alts? "]"
-map    = "{" kvals "}"
-kvals  = kval | kval "," kvals
+map    = "{" kvals? "}"
+kvals  = kval "," kvals?
 kval   = key ":" alt
 each   = "each" alt
 select = "select" alt
-index  = alt "[" ikey "]"
-atom   = const | name | "(" alt ")"
-const  = string | int | float | bool
-key    =
-ikey   =
-
-
-
-seq = 
-cat = "#[" seq "]"
-list = "[" seq "]"
+func   = "?" name
+base   = atom | atom "[" int "]" | atom op atom
+atom   = const | name | quoted | hole | "(" alt ")"
+const  = string | int | float | bool 
+quoted = "'" name
+key    = string | name
+op     = "==" | "<" | "<=" | ">" | ">="
+string = "\"" schars "\""
+hole   = "$" name
 
 type selfQuery struct{}
 type Seq []Query
