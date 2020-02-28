@@ -27,7 +27,7 @@ const  = string | int | float | bool
 quoted = "'" name
 key    = string | name
 op     = "==" | "<" | "<=" | ">" | ">="
-string = "\"" schnars "\""
+string = "\"" schars "\""
 hole   = "$" name
 
 type selfQuery struct{}
@@ -50,6 +50,23 @@ func Ge(needle interface{}) Query {
 func IsNil(obj interface{}) bool { return obj == nil }
 func NotNil(obj interface{}) bool { return obj != nil }
 */
+
+const (
+	tInvalid = iota
+	tName
+	tQName // quoted, func, or hole
+	tInt
+	tFloat
+	tTrue
+	tFalse
+	tLeftSQ
+	tRightSQ
+	tLeftHashSQ
+	tLeftCurly
+	tRightCurly
+	tDot
+	tColon
+)
 
 type parser struct {
 	buf *bufio.Reader
