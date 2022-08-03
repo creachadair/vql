@@ -3,7 +3,7 @@
 // value (struct, slice, map). For a value v, vql.Eval(q, v) performs the steps
 // described by q starting at v, and reports the value obtained.
 //
-// Purpose
+// # Purpose
 //
 // Decoding loosely-structured data such as JSON or YAML often produces dynamic
 // structures that are highly nested and can be inconvenient to traverse. A
@@ -14,7 +14,7 @@
 // in the case of configuration scripts with a complex nesting structure.  It
 // can also be used to safely inspect variant types with similar shapes.
 //
-// Queries
+// # Queries
 //
 // To fetch a named field from a struct, or the value from a map, use vql.Key.
 // You can supply multiple keys to do compound lookups.
@@ -221,8 +221,8 @@ func (m Map) eval(v *value) (*value, error) {
 // Func returns a Query whose value is the result of applying a function v to
 // its input. The value of v must have one of the following signatures:
 //
-//     func(T) U
-//     func(T) (U, error)
+//	func(T) U
+//	func(T) (U, error)
 //
 // Otherwise, Func will panic. If v has the second form and reports an error,
 // that error is propagated through the query chain.
